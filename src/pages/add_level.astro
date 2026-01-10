@@ -1,0 +1,57 @@
+---
+export const prerender = false;
+import { addLevel } from '../libs/queries';
+
+if (Astro.request.method === 'POST') {
+	try {
+		const formData = await Astro.request.formData();
+		const name = formData.get('name')?.toString() || '';
+		const gdIdStr = formData.get('gd_id')?.toString() || '';
+		const gd_id = gdIdStr ? parseInt(gdIdStr) : null;
+
+		addLevel(name, gd_id);
+	} catch (e) {
+		console.error('Form error:', e);
+	}
+}
+---
+<html lang="en">
+<head>
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<meta name="viewport" content="width=device-width" />
+	<meta name="generator" content={Astro.generator} />
+	<title>Add Level</title>
+</head>
+<body>
+
+<h1>Add New Level</h1>
+
+<form method="POST" enctype="multipart/form-data">
+	<div>
+		<label for="name">Level Name</label>
+		<input
+			type="text"
+			id="name"
+			name="name"
+			required
+			placeholder="Hungry Humphrey"
+		/>
+	</div>
+
+	<div>
+		<label for="gd_id">Geometry Dash ID</label>
+		<input
+			type="number"
+			id="gd_id"
+			name="gd_id"
+			placeholder="1234567"
+		/>
+	</div>
+
+	<button>Add Level</button>
+</form>
+
+<a href="/">Back to list</a>
+
+</body>
+</html>

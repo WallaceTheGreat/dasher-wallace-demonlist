@@ -1,7 +1,8 @@
 ---
-import { getCurrentRankings } from '../libs/queries';
+import { getCurrentRankings, getAllLevels } from '../libs/queries';
 
 const rankings = getCurrentRankings();
+const allLevels = getAllLevels();
 ---
 
 <html>
@@ -14,13 +15,14 @@ const rankings = getCurrentRankings();
 	</head>
 	<body>
 
+	<a href="/add_level">Add new level</a>
 	<h1>The true ranking</h1>
 	<table>
 		<thead>
 		<tr>
 			<th>Rank</th>
 			<th>Level Name</th>
-			<th>Geometry Dash ID</th>
+			<th>GD ID</th>
 		</tr>
 		</thead>
 		<tbody>
@@ -29,6 +31,28 @@ const rankings = getCurrentRankings();
 				<td>{rank.place}</td>
 				<td>{rank.level_name}</td>
 				<td>{rank.gd_id}</td>
+			</tr>
+		))}
+		</tbody>
+	</table>
+
+	<h1>All levels currently in DB</h1>
+	<table>
+		<thead>
+		<tr>
+			<th>DB Index</th>
+			<th>Level Name</th>
+			<th>GD ID</th>
+			<th>Wallace Progress</th>
+		</tr>
+		</thead>
+		<tbody>
+		{allLevels.map((level: any) => (
+			<tr>
+				<td>{level.id}</td>
+				<td>{level.name}</td>
+				<td>{level.gd_id}</td>
+				<td><i>todo :)</i></td>
 			</tr>
 		))}
 		</tbody>
