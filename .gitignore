@@ -25,3 +25,6 @@ pnpm-debug.log*
 
 # vscode garbage
 .vscode/
+
+# local SQLITE
+data/db.sqlite
