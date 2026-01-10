@@ -31,3 +31,18 @@ CREATE TABLE progresses (
 CREATE INDEX idx_placements_level_id ON placements(level_id);
 CREATE INDEX idx_scores_level_id ON scores(level_id);
 CREATE INDEX idx_progresses_level_id ON progresses(level_id);
+
+-- VIEWS
+
+-- see the current ranking
+CREATE VIEW ranking_view AS
+SELECT
+    lvl.name AS level_name,
+    lvl.gd_id,
+    p.place
+FROM
+    placements p
+        JOIN levels AS lvl ON p.level_id = lvl.id
+WHERE p.is_valid = 1
+ORDER BY p.place
+;
