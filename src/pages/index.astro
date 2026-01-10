@@ -1,16 +1,38 @@
 ---
+import { getCurrentRankings } from '../libs/queries';
 
+const rankings = getCurrentRankings();
 ---
 
-<html lang="en">
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
+		<title>Dasher Wallace Demonlist</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+
+	<h1>The true ranking</h1>
+	<table>
+		<thead>
+		<tr>
+			<th>Rank</th>
+			<th>Level Name</th>
+			<th>Geometry Dash ID</th>
+		</tr>
+		</thead>
+		<tbody>
+		{rankings.map((rank: any) => (
+			<tr>
+				<td>{rank.place}</td>
+				<td>{rank.level_name}</td>
+				<td>{rank.gd_id}</td>
+			</tr>
+		))}
+		</tbody>
+	</table>
+
 	</body>
 </html>

@@ -28,3 +28,5 @@ pnpm-debug.log*
 
 # local SQLITE
 data/db.sqlite
+data/db.sqlite-shm
+data/db.sqlite-wal
