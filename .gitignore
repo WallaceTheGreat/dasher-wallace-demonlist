@@ -30,3 +30,4 @@ pnpm-debug.log*
 data/db.sqlite
 data/db.sqlite-shm
 data/db.sqlite-wal
+data/backups
