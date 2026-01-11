@@ -39,7 +39,7 @@ export const addPlacement = (level_id: number, placement: number) => {
 		const shift_stmt = db.query(
 			'UPDATE placements_current SET place = -place + 1 WHERE place < 0'
 		);
-		shift_stmt.run(placement);
+		shift_stmt.run();
 
 		console.log("shifted placements");
 
@@ -54,22 +54,32 @@ export const addPlacement = (level_id: number, placement: number) => {
 
 	transaction();
 }
+
 export const updatePlacement = (level_id: number, old_placement: number, new_placement: number) => {
 	if (old_placement === new_placement) {
 		return;
 	}
 
 	const transaction = db.transaction(() => {
-		const remove_stmt = db.query(
-			'DELETE FROM placements_current WHERE level_id = ?'
-		);
-		remove_stmt.run(level_id);
 
+		const move_target_stmt = db.query(
+			'UPDATE placements_current SET place = -1000000 - level_id WHERE level_id = ?'
+		);
+		move_target_stmt.run(level_id);
+
+		// CASE 1: moving down
 		if (new_placement > old_placement) {
-			const shift_stmt = db.query(
-				'UPDATE placements_current SET place = place - 1 WHERE place > ? AND place <= ?'
+			const tmp_shift_stmt = db.query(
+				'UPDATE placements_current SET place = -place WHERE place > ? AND place <= ?'
 			);
-			shift_stmt.run(old_placement, new_placement);
+			tmp_shift_stmt.run(old_placement, new_placement);
+
+			const final_shift_stmt = db.query(
+				'UPDATE placements_current SET place = -place - 1 WHERE place < 0'
+			);
+			final_shift_stmt.run();
+
+		// CASE 2: moving up
 		} else {
 			const tmp_shift_stmt = db.query(
 				'UPDATE placements_current SET place = -place WHERE place >= ? AND place < ?'
@@ -82,11 +92,10 @@ export const updatePlacement = (level_id: number, old_placement: number, new_pla
 			final_shift_stmt.run();
 		}
 
-		const insert_stmt = db.query(`
-			INSERT INTO placements_current (level_id, place, last_updated)
-			VALUES (?, ?, CURRENT_TIMESTAMP)
-		`);
-		insert_stmt.run(level_id, new_placement);
+		const final_move_stmt = db.query(
+			'UPDATE placements_current SET place = ?, last_updated = CURRENT_TIMESTAMP WHERE level_id = ?'
+		);
+		final_move_stmt.run(new_placement, level_id);
 	});
 
 	transaction();
