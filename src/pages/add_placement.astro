@@ -1,0 +1,108 @@
+---
+export const prerender = false;
+
+import { addPlacement, archiveCurrentRanking, getAllLevels, getAllUnplacedLevels, getCurrentRankings } from '../libs/queries';
+
+let message = '';
+let error = '';
+
+if (Astro.request.method === 'POST') {
+	try {
+		const formData = await Astro.request.formData();
+		const levelIdStr = formData.get('level_id')?.toString() || '';
+		const placementStr = formData.get('placement')?.toString() || '';
+
+		const level_id = parseInt(levelIdStr);
+		const placement = parseInt(placementStr);
+
+		if (!level_id || !placement || placement < 1) {
+			error = 'Invalid input';
+		} else {
+			addPlacement(level_id, placement);
+			archiveCurrentRanking();
+
+			message = `Placement added at position ${placement}`;
+		}
+	} catch (e) {
+		error = `Error: ${e}`;
+	}
+}
+
+const unplacedLevels = getAllUnplacedLevels();
+const currentRankings = getCurrentRankings();
+const allLevels = getAllLevels();
+---
+
+<html lang="en">
+	<head>
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Add Placement</title>
+	</head>
+	<body>
+
+	<h1>Add New Placement</h1>
+
+	{message && <p class="success">{message}</p>}
+	{error && <p class="error">{error}</p>}
+
+	<form method="POST">
+		<div>
+			<label for="level_id">Select Level</label>
+			<select id="level_id" name="level_id" required>
+				<option value="">-- Choose a level --</option>
+				{unplacedLevels.map((level: any) => (
+					<option value={level.id}>{level.name} {level.gd_id ? `(${level.gd_id})` : ''}</option>
+				))}
+			</select>
+		</div>
+
+		<div>
+			<label for="placement">Placement Position</label>
+			<input
+				type="number"
+				id="placement"
+				name="placement"
+				min="1"
+				required
+			/>
+		</div>
+
+		<button>Add Placement</button>
+	</form>
+
+	<hr />
+
+	<h2>Current Rankings</h2>
+	<div>
+		{currentRankings.length > 0 ? (
+			<ul>
+				{currentRankings.map((rank: any) => (
+					<li>#{rank.place} - {rank.level_name}</li>
+				))}
+			</ul>
+		) : (
+			<p>Nothing here!!!</p>
+		)}
+	</div>
+
+	<hr />
+
+	<h2>All Levels</h2>
+	<div>
+		{allLevels.length > 0 ? (
+			<ul>
+				{allLevels.map((level: any) => (
+					<li>{level.name} {level.gd_id ? `- GD ID: ${level.gd_id}` : ''}</li>
+				))}
+			</ul>
+		) : (
+			<p>Nothing here!!!</p>
+		)}
+	</div>
+
+	<a href="/">Go back</a>
+
+	</body>
+</html>

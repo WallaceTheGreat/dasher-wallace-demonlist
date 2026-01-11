@@ -16,25 +16,20 @@ const allLevels = getAllLevels();
 	<body>
 
 	<a href="/add_level">Add new level</a>
+	<a href="/add_placement">Add new placement</a>
+
 	<h1>The true ranking</h1>
-	<table>
-		<thead>
-		<tr>
-			<th>Rank</th>
-			<th>Level Name</th>
-			<th>GD ID</th>
-		</tr>
-		</thead>
-		<tbody>
-		{rankings.map((rank: any) => (
-			<tr>
-				<td>{rank.place}</td>
-				<td>{rank.level_name}</td>
-				<td>{rank.gd_id}</td>
-			</tr>
-		))}
-		</tbody>
-	</table>
+	<div>
+		{rankings.length > 0 ? (
+			<ul>
+				{rankings.map((rank: any) => (
+					<li>#{rank.place} - {rank.level_name}</li>
+				))}
+			</ul>
+		) : (
+			<p>No current rankings</p>
+		)}
+	</div>
 
 	<h1>All levels currently in DB</h1>
 	<table>
