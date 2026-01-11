@@ -51,6 +51,7 @@ CREATE INDEX idx_levels_opinions_level_id ON levels_opinions(level_id);
 
 CREATE VIEW ranking_view AS
 SELECT
+    pc.level_id,
     pc.place,
     l.name AS level_name,
     l.gd_id

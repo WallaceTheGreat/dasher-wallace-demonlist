@@ -1,7 +1,7 @@
 import db from './db.ts';
 
 export const getCurrentRankings = () => {
-	const stmt = db.query('SELECT * FROM ranking_view');
+	const stmt = db.query('SELECT level_id, place, level_name, gd_id FROM ranking_view');
 	return stmt.all();
 }
 
@@ -54,6 +54,50 @@ export const addPlacement = (level_id: number, placement: number) => {
 
 	transaction();
 }
+export const updatePlacement = (level_id: number, old_placement: number, new_placement: number) => {
+	if (old_placement === new_placement) {
+		return;
+	}
+
+	const transaction = db.transaction(() => {
+		const remove_stmt = db.query(
+			'DELETE FROM placements_current WHERE level_id = ?'
+		);
+		remove_stmt.run(level_id);
+
+		if (new_placement > old_placement) {
+			const shift_stmt = db.query(
+				'UPDATE placements_current SET place = place - 1 WHERE place > ? AND place <= ?'
+			);
+			shift_stmt.run(old_placement, new_placement);
+		} else {
+			const tmp_shift_stmt = db.query(
+				'UPDATE placements_current SET place = -place WHERE place >= ? AND place < ?'
+			);
+			tmp_shift_stmt.run(new_placement, old_placement);
+
+			const final_shift_stmt = db.query(
+				'UPDATE placements_current SET place = -place + 1 WHERE place < 0'
+			);
+			final_shift_stmt.run();
+		}
+
+		const insert_stmt = db.query(`
+			INSERT INTO placements_current (level_id, place, last_updated)
+			VALUES (?, ?, CURRENT_TIMESTAMP)
+		`);
+		insert_stmt.run(level_id, new_placement);
+	});
+
+	transaction();
+};
+
+export const getCurrentPlacement = (level_id: number) => {
+	const stmt = db.query(
+		'SELECT * FROM placements_current WHERE level_id = ?'
+	);
+	return stmt.get(level_id);
+};
 
 export const archiveCurrentRanking = () => {
 	const archive_query = `
