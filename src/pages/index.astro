@@ -24,7 +24,14 @@ const allLevels = getAllLevels();
 		{rankings.length > 0 ? (
 			<ul>
 				{rankings.map((rank: any) => (
-					<li>#{rank.place} - {rank.level_name}</li>
+					<li>#{rank.place} - {rank.level_name}
+						{rank.confidence !== null && rank.confidence !== 2 && (
+							<span>
+								{" "}
+								<i>({rank.confidence === 1 ? "current feeling" : "projected"})</i>
+							</span>
+						)}
+					</li>
 				))}
 			</ul>
 		) : (

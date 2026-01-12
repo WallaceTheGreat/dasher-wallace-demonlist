@@ -1,7 +1,7 @@
 import db from './db.ts';
 
 export const getCurrentRankings = () => {
-	const stmt = db.query('SELECT level_id, place, level_name, gd_id FROM ranking_view');
+	const stmt = db.query('SELECT level_id, place, confidence, level_name, gd_id FROM ranking_view');
 	return stmt.all();
 }
 
@@ -28,7 +28,7 @@ export const addLevel = (name: string, gd_id: number | null) => {
 	return stmt.run(name, gd_id);
 }
 
-export const addPlacement = (level_id: number, placement: number) => {
+export const addPlacement = (level_id: number, placement: number, confidence: number | null) => {
 	const transaction = db.transaction(() => {
 
 		const tmp_shift_stmt = db.query(
@@ -41,13 +41,11 @@ export const addPlacement = (level_id: number, placement: number) => {
 		);
 		shift_stmt.run();
 
-		console.log("shifted placements");
-
 		const insert_stmt = db.query(`
-			INSERT INTO placements_current (level_id, place, last_updated)
-			VALUES (?, ?, CURRENT_TIMESTAMP)
+			INSERT INTO placements_current (level_id, place, last_updated, confidence)
+			VALUES (?, ?, ?, CURRENT_TIMESTAMP)
 		`);
-		insert_stmt.run(level_id, placement);
+		insert_stmt.run(level_id, placement, confidence);
 
 		console.log("inserted new placement");
 	});

@@ -11,14 +11,16 @@ if (Astro.request.method === 'POST') {
 		const formData = await Astro.request.formData();
 		const levelIdStr = formData.get('level_id')?.toString() || '';
 		const placementStr = formData.get('placement')?.toString() || '';
+		const confidenceStr = formData.get('confidence')?.toString() || '';
 
 		const level_id = parseInt(levelIdStr);
 		const placement = parseInt(placementStr);
+		const confidence = parseInt(confidenceStr);
 
 		if (!level_id || !placement || placement < 1) {
 			error = 'Invalid input';
 		} else {
-			addPlacement(level_id, placement);
+			addPlacement(level_id, placement, confidence);
 			archiveCurrentRanking();
 
 			message = `Placement added at position ${placement}`;
@@ -66,6 +68,17 @@ const allLevels = getAllLevels();
 				name="placement"
 				min="1"
 				required
+			/>
+		</div>
+
+		<div>
+			<label for="confidence">Confidence</label>
+			<input
+				type="number"
+				id="confidence"
+				name="confidence"
+				min="0"
+				default="0"
 			/>
 		</div>
 
